@@ -1,0 +1,30 @@
+Tạo tiến trình zombies (zombies process) và tiến trình mồ côi (orphan process)
+Xem tiến trình cha và con 
+-----------------------
+grep - axu | grep <Tên_chương_trình_binary>
+-----------------------
+
+Điều kiện tiên quyết là sau khi mỗi tiến trình con thực hiện xong thì bắt buộc
+phải trả về trạng thái (status) của tiến trình con đó mặc dù tiến trình đó đã hoàn
+thành hay thất bại, đồng thời kèm theo PID của tiến trình con đó (child process) để
+tiến trình cha xác nhận là tiến trình con nào đã trả về trạng thái đó
+
+Tiến trình orphan được tạo ra khi tiến trình con trả về status và pid của chính nó 
+nhưng tiến trình cha không còn tồn tại. Thời điểm này tiến trình con sẽ tiếp tục nhận
+tiến trình gốc làm tiến trình cha (Shell process - Tiến trình tạo ra tiến trình cha
+trước đó) và sẽ hoàn thành tiếp việc gửi status và PID của nó
+
+Tiến trình zombies (Tiến trình đã chết và chỉ còn giữ lại các thông tin quan trọng nhất
+như PID và trạng thái của nó vì vậy không thể thực hiện được lệnh kill với tiến trình
+zombies) được tạo ra khi tiến trình con đã hoàn thành chương trình và lúc này cần trả về
+PID và status cho tiến trình cha nhưng tiến trình cha không nhận được thông tin của tiến 
+trình con trả về. Tại thời điểm này tiến trình con sẽ giải phóng bộ nhớ của nó và chỉ lưu
+giữ lại các thông tin quan trọng như PID và status của nó và sau đó bản thân nó sẽ trở thành
+trạng thái zombies hay còn gọi là tiến trình zombies. 
+
+Một vấn đề cần lưu ý là tiến trình zombies nếu chiếm quá nhiều thì đến 1 lúc nào đó nó sẽ 
+cản trở việc tạo tiến trình mới của hệ điều hành vì vậy cần phải giải quyết các tiến trình
+zombies bằng cách tiến hành "kill tiến trình cha" của tiến trình zombies này và đưa tiến 
+trình zombies này thành tiếng trình orphan. Lúc này tiếng trình orphan này sẽ gửi PID và 
+status của nó cho tiến trình init (init process - có PID = 1 là tiến trình cha của mọi
+tiến trình) và sẽ hoàn thành tiếp việc gửi status và PID của nó

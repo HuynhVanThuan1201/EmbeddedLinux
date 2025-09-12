@@ -1,0 +1,56 @@
+BÁO CÁO: Hành vi của tiến trình con sau khi exec() được gọi thành công (Có kèm sơ đồ minh họa)
+
+1. Không gian địa chỉ (Address Space)
+- Toàn bộ không gian địa chỉ cũ của tiến trình con bị xóa:
+  + Code (mã lệnh cũ)
+  + Data segment (biến toàn cục, static)
+  + Heap (bộ nhớ động)
+  + Stack (ngăn xếp cục bộ)
+- Thay bằng không gian địa chỉ mới của chương trình được exec gọi.
+- Các file descriptor mở vẫn được giữ lại (trừ khi exec yêu cầu đóng).
+
+2. Mã lệnh (Code)
+- Mã lệnh cũ bị thay thế hoàn toàn bằng mã lệnh của chương trình mới (ví dụ: lệnh "ls").
+- Tiến trình con trở thành một chương trình khác, nhưng PID của nó vẫn giữ nguyên.
+
+3. Hậu quả
+- Mọi lệnh sau exec() trong mã nguồn cũ sẽ không bao giờ được thực thi, trừ khi exec() thất bại.
+- Tiến trình cha vẫn thấy PID con như cũ, nhưng con đã “hóa thân” thành chương trình khác.
+
+
+Ví dụ minh họa (C):
+-------------------------------------------------
+pid_t pid = fork();
+if (pid == 0) {
+    printf("Truoc exec\n");
+    execlp("ls", "ls", NULL);  // Thay toàn bộ tiến trình con bằng "ls"
+    printf("Sau exec\n");     // Không bao giờ chạy nếu exec thành công
+}
+
+
+-------------------------------------------------
+Sơ đồ minh họa bằng ASCII:
+-------------------------------------------------
+Trước exec() trong tiến trình con:
++------------------+
+|  Code (cũ)       |
+|  Data            |
+|  Heap            |
+|  Stack           |
++------------------+
+
+Sau exec() thành công:
++------------------+
+|  Code (mới: ls)  |
+|  Data (ls)       |
+|  Heap (ls)       |
+|  Stack (ls)      |
++------------------+
+
+-> Không gian địa chỉ cũ bị thay thế hoàn toàn.
+
+-------------------------------------------------
+
+Kết luận:
+- exec() không tạo tiến trình mới, mà thay thế tiến trình hiện tại bằng chương trình mới.
+- Đây là cơ chế quan trọng để triển khai lệnh trong shell hoặc các chương trình đa tiến trình.
