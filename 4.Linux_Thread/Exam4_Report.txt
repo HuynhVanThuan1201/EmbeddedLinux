@@ -1,0 +1,43 @@
+Phân tích cơ chế Read-Write Lock trong chương trình
+
+1. Reader (luồng đọc):
+   - Hàm reader() dùng pthread_rwlock_rdlock() để lấy khóa đọc.
+   - Nhiều Reader có thể cùng lúc lấy khóa đọc, vì hành động đọc không làm thay đổi dữ liệu.
+   - Kết quả: nhiều Reader có thể chạy song song và cùng in ra giá trị của shared_data.
+
+   Ví dụ quan sát khi chạy chương trình:
+   Reader 0 đọc giá trị: 15
+   Reader 1 đọc giá trị: 15
+   Reader 2 đọc giá trị: 15
+   Reader 4 đọc giá trị: 15
+   Reader 3 đọc giá trị: 15
+   => Cả năm Reader cùng đọc một giá trị tại cùng thời điểm.
+
+2. Writer (luồng ghi):
+   - Hàm writer() dùng pthread_rwlock_wrlock() để lấy khóa ghi.
+   - Sau khi ghi (shared_data++), Writer giữ khóa ghi trong 5 giây (vòng lặp count).
+   - Trong khoảng 5 giây đó:
+     + Không Reader nào được phép đọc.
+     + Không Writer nào khác được phép ghi.
+   - Writer giữ độc quyền, đến khi gọi pthread_rwlock_unlock() mới nhả khóa.
+
+   Ví dụ quan sát khi chạy chương trình:
+   Writer 0 ghi giá trị mới: 16
+   Writer is holding thread write lock in 5 seconds
+   Second 0 ...
+   Second 1 ...
+   Second 2 ...
+   Second 3 ...
+   Second 4 ...
+   => Trong thời gian Writer giữ khóa, không có Reader nào xuất hiện.
+
+3. Ý nghĩa thực tế:
+   - Nếu chỉ dùng Mutex: mỗi lần chỉ có 1 Reader hoặc 1 Writer được phép truy cập => gây tắc nghẽn khi nhiều Reader.
+   - Với Read-Write Lock:
+     + Cho phép nhiều Reader chạy đồng thời => cải thiện hiệu suất khi nhu cầu đọc nhiều.
+     + Writer vẫn chạy độc quyền => đảm bảo tính toàn vẹn dữ liệu khi ghi.
+
+Kết luận: 
+- Read-Write Lock giúp cân bằng giữa hiệu suất (cho Reader song song) và tính an toàn dữ liệu (Writer độc quyền). 
+- Trong chương trình, ta thấy rõ: Readers in ra liên tục khi không có Writer, nhưng khi Writer chiếm khóa thì Readers
+phải dừng lại hoàn toàn cho đến khi Writer nhả khóa.

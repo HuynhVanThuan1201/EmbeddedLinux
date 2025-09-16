@@ -1,0 +1,41 @@
+Vấn đề "Race Condition" và Giải pháp Mutex
+
+Câu hỏi phân tích:
+
+1. Tại sao cần phải sử dụng mutex trong bài toán này?
+- Mutex (Mutual Exclusion) được sử dụng để đảm bảo rằng tại một thời điểm chỉ có một luồng được phép truy cập
+và thay đổi biến dùng chung (shared_counter). 
+- Nếu không có mutex, nhiều luồng có thể cùng lúc đọc và ghi giá trị biến shared_counter, dẫn đến việc ghi đè
+dữ liệu lẫn nhau. 
+- Kết quả cuối cùng sẽ bị sai vì các phép tăng (++) không được thực hiện đầy đủ và chính xác.
+
+2. Điều gì sẽ xảy ra nếu chúng ta bỏ qua việc sử dụng mutex?
+- Nếu bỏ qua mutex, các luồng có thể đồng thời thực hiện thao tác shared_counter++. 
+- Khi hai hoặc nhiều luồng thực hiện cùng lúc, có thể xảy ra tình huống:
+    + Luồng A đọc giá trị của shared_counter.
+    + Luồng B cũng đọc cùng giá trị trước khi A kịp ghi lại.
+    + Cả hai cùng ghi giá trị mới, nhưng một trong hai sẽ bị ghi đè.
+- Do đó, tổng số lần tăng thực sự sẽ ít hơn mong đợi, dẫn đến kết quả cuối cùng không chính xác và không ổn định
+(chạy lại nhiều lần sẽ có kết quả khác nhau).
+
+Tóm lại:
+- Có mutex: Kết quả đúng và ổn định, shared_counter = 3,000,000.
+- Không có mutex: Kết quả sai, nhỏ hơn 3,000,000 và thay đổi ngẫu nhiên mỗi lần chạy chương trình.
+
+--------------------------------------------
+Một số vấn đề bổ sung về dead lock:
+- Thứ nhất là tồn tại một vòng tròn các tiến trình/luồng, mỗi thread chờ tài nguyên do thread kế tiếp giữ.
+    Ví dụ:
+    Thread A giữ lock1, chờ lock2.
+    Thread B giữ lock2, chờ lock3.
+
+- Thứ hai là khai báo liên tiếp 1 lock nhiều lần, mặc dù có unlock sau cùng nhưng vẫn sẽ xảy ra dead lock
+    Ví dụ:
+    void *Thread_A(){
+        pthread_mutex_lock(&lock1);
+        --------
+        //Code
+        --------
+        pthread_mutex_lock(&lock1);
+        pthread_mutex_unlock(&lock1);
+    }

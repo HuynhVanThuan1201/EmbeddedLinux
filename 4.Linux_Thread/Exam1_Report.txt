@@ -1,0 +1,77 @@
+Phân tích Bài tập 1: Tạo và Chạy Luồng Cơ bản
+
+1. Mục tiêu chương trình
+------------------------
+Chương trình này tạo ra hai luồng (thread) trong ngôn ngữ C sử dụng thư viện pthread. 
+Mỗi luồng sẽ in ra một thông điệp kèm theo ID của chính nó, sau đó kết thúc. 
+Luồng chính (main thread) sẽ chờ cả hai luồng con hoàn tất bằng pthread_join() 
+trước khi in ra thông điệp cuối cùng và kết thúc chương trình.
+
+2. Các thành phần chính trong chương trình
+-------------------------------------------
+- Biến toàn cục:
+    pthread_t thread_id1, thread_id2;
+    -> Dùng để lưu giữ ID của hai luồng được tạo ra.
+
+- Hàm thr_handler1() và thr_handler2():
+    -> Đây là hàm xử lý (thread handler) sẽ được truyền vào pthread_create().
+    -> Mỗi khi luồng được khởi tạo, nó sẽ chạy vào hàm này.
+    -> Cả hai hàm đều in ra một thông điệp chứa ID của luồng hiện tại (pthread_self()).
+    -> Sau đó gọi pthread_exit(NULL) để kết thúc luồng an toàn.
+
+- Hàm main():
+    -> Gọi pthread_create() để tạo ra luồng 1 (thread_id1).
+    -> Dùng sleep(2) để trì hoãn trước khi tạo luồng 2 (thread_id2), nhằm minh họa sự 
+       tạo luồng tại các thời điểm khác nhau.
+    -> Sau khi tạo hai luồng, chương trình gọi pthread_join(thread_id1, NULL) và 
+       pthread_join(thread_id2, NULL) để chờ các luồng này kết thúc.
+    -> Cuối cùng in ra thông báo "Hi, I'm main, all threads finished!"
+
+3. Vai trò và tham số của pthread_create()
+-------------------------------------------
+Cú pháp:
+    int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
+                       void *(*start_routine)(void*), void *arg);
+
+- *thread: Con trỏ tới biến pthread_t, nơi lưu ID của luồng mới tạo.
+- *attr: Thuộc tính của luồng (ví dụ: detached, stack size,...). Nếu NULL thì dùng mặc định.
+- *start_routine: Hàm xử lý mà luồng mới sẽ chạy (hàm phải có dạng trả về void* và nhận void*).
+- *arg: Đối số truyền vào hàm xử lý. Nếu không cần thì truyền NULL.
+
+Trong chương trình này:
+    pthread_create(&thread_id1, NULL, &thr_handler1, NULL);
+
+4. Vai trò và tham số của pthread_join()
+-------------------------------------------
+Cú pháp:
+    int pthread_join(pthread_t thread, void **retval);
+
+- thread: ID của luồng cần chờ kết thúc.
+- retval: Con trỏ tới biến nhận giá trị trả về của luồng (nếu không cần thì truyền NULL).
+
+Trong chương trình này:
+    pthread_join(thread_id1, NULL);
+    pthread_join(thread_id2, NULL);
+
+Mục đích: đảm bảo luồng chính sẽ đợi đến khi luồng con hoàn thành công việc trước khi tiếp tục.
+
+5. Một luồng kết thúc khi nào?
+-------------------------------
+- Khi hàm handler kết thúc và luồng thoát ra (return từ hàm hoặc gọi pthread_exit()).
+- Hoặc khi luồng bị hủy bởi pthread_cancel().
+- Hoặc khi dùng bởi exit() hoặc hàm main() kết thúc
+-------------------------------
+- Trong chương trình này, luồng kết thúc khi thực thi đến pthread_exit(NULL).
+
+Lưu ý: 
+- Khi một thread return từ hàm hoặc sử dụng pthread_exit() hoặc pthread_cancel() thì chỉ
+kết thúc thread hiện tại.
+- Nếu dùng exit() hoặc hàm main() kết thúc thì tất cả các thread đều sẽ kết thúc ngay lập tức.
+
+Kết luận:
+---------
+Chương trình minh họa cách tạo luồng, chạy công việc trong luồng và đồng bộ kết thúc luồng 
+bằng pthread_join()
+Nhược điểm khi dùng pthread_join() là sẽ làm hàm main() ở trạng thái chờ và không thể làm các task vụ khác. Vì vậy
+trong phần lớn đa số trường hợp nếu không quan tâm đến trạng thái kết thúc của thread thì có thể cải thiện bằng
+cách sử dụng pthread detaching (pthread_detach() thay thế cho pthread_join()).
