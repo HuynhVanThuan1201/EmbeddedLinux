@@ -1,0 +1,12 @@
+Câu hỏi: Nếu bỏ qua tín hiệu SIGINT, chuyện gì sẽ xảy ra khi nhấn Ctrl+C?
+
+👉 Nếu ta bỏ qua tín hiệu SIGINT (dùng signal(SIGINT, SIG_IGN);), thì khi nhấn Ctrl+C, chương trình sẽ không bị dừng nữa.
+Tức là chương trình sẽ tiếp tục chạy bình thường vì tín hiệu bị bỏ qua hoàn toàn.
+
+Note:
+
+signal(SIGINT, sig_handler); → gọi hàm của bạn.
+
+signal(SIGINT, SIG_IGN); → bỏ qua tín hiệu.         //SIG_IGN (Signal Ignore)
+
+signal(SIGINT, SIG_DFL); → trở về hành vi mặc định. //SIG_DFL (Signal Default)

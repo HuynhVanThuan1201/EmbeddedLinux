@@ -1,0 +1,13 @@
+❓ Tại sao cần dùng kill()?
+
+Hàm kill(pid, signal) cho phép một process gửi tín hiệu đến process khác (hoặc chính nó).
+
+Trong bài toán cha–con:
+- Process cha cần gửi tín hiệu SIGUSR1 cho process con.
+- Nếu không dùng kill(), cha không có cách trực tiếp báo cho con “hãy làm việc đi”.
+
+Lưu ý:
+- signal() chỉ dùng trong process nhận để đăng ký hàm xử lý khi tín hiệu đến.
+- Nó không gửi tín hiệu.
+
+👉 Vì vậy, cần kill() để process cha kích hoạt hành động hoặc gửi tín hiệu đến process con.

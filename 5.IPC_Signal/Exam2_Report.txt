@@ -1,0 +1,11 @@
+Sử dụng tín hiệu SIGALRM để tạo Timer
+--------------------------------------------
+Câu hỏi: Nếu không gọi lại alarm(1) trong hàm xử lý thì chuyện gì xảy ra?
+
+Trả lời:
+- alarm(seconds) chỉ kích hoạt một lần → tức là sau khi hết seconds giây, nó gửi SIGALRM.
+
+- Nếu bạn chỉ gọi alarm(1) một lần ở main(), thì bạn sẽ chỉ nhận được 1 tín hiệu SIGALRM sau 1 giây 
+  → biến counter chỉ tăng lên 1 lần duy nhất, rồi chương trình đứng im chờ mãi ở pause().
+
+- Muốn lặp lại hàng giây → phải gọi lại alarm(1) trong handler để đặt lịch cho lần kế tiếp.
