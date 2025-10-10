@@ -37,9 +37,12 @@ void detect_local_ip(void) {
     if (sock < 0) return;
 
     struct sockaddr_in serv = {0};
+
+    // Init Server Information
     serv.sin_family = AF_INET;
     serv.sin_port = htons(53);
-    inet_pton(AF_INET, "8.8.8.8", &serv.sin_addr);
+    if (inet_pton(AF_INET, "8.8.8.8", &serv.sin_addr) == -1)
+        handle_error("inet_pton()");
 
     if (connect(sock, (struct sockaddr*)&serv, sizeof(serv)) == 0) {
         struct sockaddr_in name;
@@ -63,15 +66,15 @@ void cmd_connect(char *ipstr, char *portstr) {
     if (inet_pton(AF_INET, ipstr, &serv_addr.sin_addr) == -1)
         handle_error("inet_pton()");
 
-    // Check and block self-connection attempt
+    // Check self-connection attempt
     if (strcmp(ipstr, local_ip) == 0 && port == listen_port) {
         printf("Refusing to connect to self\n");
         return;
     }
 
-    // Check and block duplicate connection attempt
+    // Check duplicate connection attempt
     if (exists_connection_with_addr(&serv_addr)) {
-        printf("Already connected\n");
+        printf("Connection already exists\n");
         return;
     }
 
@@ -179,7 +182,7 @@ void cleanup_all(void) {
     for (int i = 0; i < MAX_CONN; ++i) {
         if (conns[i].active) {
             pthread_join(conns[i].thread_id, NULL);
-
+            
             pthread_mutex_lock(&conns_mutex);
             remove_connection_by_index(i);
             pthread_mutex_unlock(&conns_mutex);

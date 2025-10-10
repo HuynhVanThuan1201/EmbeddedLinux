@@ -68,7 +68,7 @@ void *accept_thread_fn(void *arg) {
         printf("\nAccepted a new connection from address: %s:%d\n", client_ip, client_port);
         fflush(stdout);
 
-        // Add to table connection
+        // Add new connection to connection of table
         int id = add_new_connection(new_socket_fd, &client_addr);
         int idx = find_index_by_id(id);
         if (id < 0 || idx < 0) continue;

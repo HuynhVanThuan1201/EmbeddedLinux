@@ -13,7 +13,6 @@ static int next_conn_id = 1;
 void connection_table_init() {
     memset(conns, 0, sizeof(conns));
     for (int i = 0; i < MAX_CONN; ++i) {
-        conns[i].id = i;
         conns[i].sock_fd = -1;
     }
 }

@@ -26,12 +26,15 @@ int main(int argc, char *argv[]) {
     connection_table_init();
 
     listen_port = atoi(argv[1]);
-    detect_local_ip();
+    if (listen_port <= 0 || listen_port > 65535) {
+        fprintf(stderr, "Invalid port.\n");
+        return 1;
+    }
 
     int opt = 1;
     struct sockaddr_in serv_addr = {0};
 
-    /* 01. Create socket */
+    /* 01. Create server socket */
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd == -1)
         handle_error("socket()");
@@ -43,7 +46,7 @@ int main(int argc, char *argv[]) {
     /* Address already in use */
     if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
         handle_error("setsockopt()");
-
+    
     /* 01.1 Init server information */
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(listen_port); // convert to network byte order (MSB)
@@ -61,6 +64,7 @@ int main(int argc, char *argv[]) {
     pthread_create(&accept_thread_id, NULL, accept_thread_fn, NULL);
 
     print_help();
+    detect_local_ip();
     printf("P2P Chat started on %s:%d\n", local_ip, listen_port); 
 
     char *line = NULL;
@@ -68,18 +72,18 @@ int main(int argc, char *argv[]) {
     while (1) {
         printf("\nEnter your command: ");
         ssize_t len = getline(&line, &cap, stdin);
+
         if (len <= 0) continue;
         if (line[len - 1] == '\n') line[len - 1] = '\0';
-
         char *cmd = strtok(line, " ");
         if (!cmd) continue;
+
         if (strcmp(cmd, "help") == 0) {
             print_help();
         }
         else if (strcmp(cmd, "myip") == 0) {
             printf("Your local IP address is: %s\n", local_ip);
-        }
-            
+        } 
         else if (strcmp(cmd, "myport") == 0) {
             printf("Your program is currently listening on port: %d\n", listen_port);
         }
@@ -106,6 +110,7 @@ int main(int argc, char *argv[]) {
         }
         else if (strcmp(cmd, "exit") == 0) {
             cleanup_all();
+            break;
         }
         else {
             printf("Unknown command: '%s'\n", cmd);
