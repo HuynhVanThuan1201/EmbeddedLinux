@@ -17,7 +17,6 @@ const char *get_file_type(mode_t m) {
     return "Unknown";
 }
 
-/* Hiển thị thông tin file */
 void print_file_info(const char *path) {
     struct stat st;
 
@@ -30,7 +29,7 @@ void print_file_info(const char *path) {
     printf("File Type     : %s\n", get_file_type(st.st_mode));
     printf("Size          : %lld bytes\n", (long long)st.st_size);
 
-    // Thời gian chỉnh sửa cuối
+    // Print time last modified
     char ts[64];
     struct tm *lt = localtime(&st.st_mtime);
     if (lt != NULL && strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", lt) != 0) {

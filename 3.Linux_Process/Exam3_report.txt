@@ -22,9 +22,12 @@ trình con trả về. Tại thời điểm này tiến trình con sẽ giải p
 giữ lại các thông tin quan trọng như PID và status của nó và sau đó bản thân nó sẽ trở thành
 trạng thái zombies hay còn gọi là tiến trình zombies. 
 
-Một vấn đề cần lưu ý là tiến trình zombies nếu chiếm quá nhiều thì đến 1 lúc nào đó nó sẽ 
-cản trở việc tạo tiến trình mới của hệ điều hành vì vậy cần phải giải quyết các tiến trình
-zombies bằng cách tiến hành "kill tiến trình cha" của tiến trình zombies này và đưa tiến 
-trình zombies này thành tiếng trình orphan. Lúc này tiếng trình orphan này sẽ gửi PID và 
-status của nó cho tiến trình init (init process - có PID = 1 là tiến trình cha của mọi
-tiến trình) và sẽ hoàn thành tiếp việc gửi status và PID của nó
+Một vấn đề cần lưu ý:
+- Tiến trình zombies nếu chiếm quá nhiều thì đến 1 lúc nào đó nó sẽ cản trở việc tạo tiến
+trình mới của hệ điều hành vì vậy để giải quyết các tiến trình zombies bằng cách tiến
+hành "kill tiến trình cha" của tiến trình zombies này và đưa tiến trình zombies này thành
+tiến trình orphan. Lúc này tiếng trình orphan này sẽ gửi PID và status của nó cho tiến trình
+init (init process - có PID = 1 là tiến trình cha của mọi tiến trình) và sẽ hoàn thành tiếp
+việc gửi status và PID của nó.
+
+- Để giải quyết tiến trình zombies thì cách tốt nhất là không nên tạo ra nó từ ban đầu

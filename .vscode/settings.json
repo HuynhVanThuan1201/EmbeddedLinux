@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "types.h": "c",
+        "stdlib.h": "c",
+        "in.h": "c",
+        "string.h": "c",
+        "pthread.h": "c",
+        "unistd.h": "c",
+        "connection.h": "c",
+        "stdio.h": "c",
+        "inet.h": "c",
+        "server.h": "c",
+        "errno.h": "c",
+        "socket.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}
