@@ -11,7 +11,10 @@
         "inet.h": "c",
         "server.h": "c",
         "errno.h": "c",
-        "socket.h": "c"
+        "socket.h": "c",
+        "posix-ipc": "c",
+        "main": "c",
+        "stat.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
