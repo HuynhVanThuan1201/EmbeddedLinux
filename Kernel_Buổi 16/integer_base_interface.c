@@ -25,3 +25,12 @@ static void __exit mgpio_driver_exit(void)
     gpio_free(GPIO_NUMBER_27);
     pr_info("GPIO27 set to LOW\n");
 }
+
+module_init(mgpio_driver_init);
+module_exit(mgpio_driver_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR(DRIVER_AUTHOR);
+MODULE_DESCRIPTION(DRIVER_DESC);
+MODULE_VERSION(DRIVER_VERS);
+
