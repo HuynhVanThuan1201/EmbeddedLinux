@@ -38,10 +38,18 @@ static int mgpio_driver_remove(struct platform_device *pdev)
     return 0;
 }
 
-module_init(mgpio_driver_probe);
-module_exit(mgpio_driver_remove);
+static struct platform_driver mgpio = {
+    .probe = mgpio_driver_probe,
+    .remove = mgpio_driver_remove,
+    .driver = {
+        .name = "gpio-descriptor-based",
+        .of_match_table = of_match_ptr(gpiod_dt_ids),
+        .owner = THIS_MODULE,
+    },
+};
+
+module_platform_driver(mgpio);
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR(DRIVER_AUTHOR);
-MODULE_DESCRIPTION(DRIVER_DESC);
-MODULE_VERSION(DRIVER_VERS);
+MODULE_AUTHOR("DevLinux");
+MODULE_DESCRIPTION("Descriptor-Based GPIO Driver for Raspberry Pi Zero W");
